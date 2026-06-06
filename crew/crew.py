@@ -20,10 +20,13 @@ import os
 import sys
 from pathlib import Path
 
+from typing import Callable
+
 from crewai import Agent, Crew, Process, Task
 from crewai_tools import MCPServerAdapter
 from mcp import StdioServerParameters
 
+from approval_tool import ApprovalSaveTool
 from tracer import RunTracer
 
 # ---------------------------------------------------------------------------
@@ -46,11 +49,21 @@ _GROUNDING_RULE = (
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
-def run_crew(question: str) -> str:
+def run_crew(
+    question: str,
+    approval_fn: Callable[[str], str] | None = None,
+) -> str:
     """
     Run the four-agent crew against the given question.
-    Returns the Verifier's final answer string (either a saved-report confirmation
-    or a Verification Failed message with unsupported statements listed).
+
+    approval_fn: optional callable used as the input() function inside the
+    human approval gate. Defaults to builtins.input (interactive terminal
+    prompt). Pass a mock in tests to drive the gate without stdin, e.g.:
+        run_crew(question, approval_fn=lambda _: "y")
+
+    Returns the Verifier's final answer string — either:
+      "Verification Passed" + save confirmation + summary, or
+      "Verification Failed" + list of unsupported statements.
     The MCP server subprocess is always stopped in the finally block.
     """
     if not question or not question.strip():
@@ -85,6 +98,15 @@ def run_crew(question: str) -> str:
         search_tool   = _tool("search_documents")
         record_tool   = _tool("read_record")
         report_tool   = _tool("save_report")
+
+        # Wrap save_report with the human approval gate.
+        # approval_fn is injected here so tests can pass a mock without
+        # patching builtins.input globally.
+        import builtins as _builtins
+        gated_report_tool = ApprovalSaveTool(
+            underlying=report_tool,
+            input_fn=approval_fn if approval_fn is not None else _builtins.input,
+        )
 
         # -------------------------------------------------------------------
         # Agents
@@ -186,7 +208,7 @@ def run_crew(question: str) -> str:
                 "You never save a report that contains even one unsupported statement. "
                 f"{_GROUNDING_RULE}"
             ),
-            tools=[search_tool, report_tool],
+            tools=[search_tool, gated_report_tool],
             max_iter=6,
             verbose=True,
         )

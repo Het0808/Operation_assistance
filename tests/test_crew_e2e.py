@@ -261,13 +261,23 @@ class TestCrewSideEffects:
         )
 
 
+# ---------------------------------------------------------------------------
+# Approval gate helper — auto-approves in tests so stdin is never touched
+# ---------------------------------------------------------------------------
+_AUTO_APPROVE = lambda _: "y"   # noqa: E731
+_AUTO_CANCEL  = lambda _: "n"   # noqa: E731
+
+
 # ===========================================================================
 # E2E: Verifier agent behaviour
 # ===========================================================================
 class TestCrewVerifier:
 
     def test_verification_passed_in_result_for_grounded_question(self):
-        result = run_crew("What is the return window for electronics?")
+        result = run_crew(
+            "What is the return window for electronics?",
+            approval_fn=_AUTO_APPROVE,
+        )
         assert "Verification Passed" in result, (
             f"Expected 'Verification Passed' in result.\nResult:\n{result}"
         )
@@ -275,7 +285,10 @@ class TestCrewVerifier:
     def test_report_saved_only_after_verification_passes(self):
         reports_dir = _REPO_ROOT / "outputs" / "reports"
         before = _reports_count_before()
-        result = run_crew("What is the free shipping threshold?")
+        result = run_crew(
+            "What is the free shipping threshold?",
+            approval_fn=_AUTO_APPROVE,
+        )
         after = len(list(reports_dir.glob("*.md")))
         if "Verification Passed" in result:
             assert after > before, (
@@ -285,8 +298,10 @@ class TestCrewVerifier:
     def test_verification_failed_blocks_save_on_bad_question(self):
         reports_dir = _REPO_ROOT / "outputs" / "reports"
         before = _reports_count_before()
-        # A nonsense question should produce no evidence and force Verification Failed
-        result = run_crew("What is our policy on teleportation devices?")
+        result = run_crew(
+            "What is our policy on teleportation devices?",
+            approval_fn=_AUTO_APPROVE,  # approval_fn won't even be reached if Verification Failed
+        )
         after = len(list(reports_dir.glob("*.md")))
         if "Verification Failed" in result:
             assert after == before, (
@@ -294,9 +309,11 @@ class TestCrewVerifier:
             )
 
     def test_verification_failed_lists_unsupported_statements(self):
-        result = run_crew("What is our policy on teleportation devices?")
+        result = run_crew(
+            "What is our policy on teleportation devices?",
+            approval_fn=_AUTO_APPROVE,
+        )
         if "Verification Failed" in result:
-            # The failure report must list at least one unsupported statement
             lines = result.splitlines()
             numbered = [l for l in lines if l.strip() and l.strip()[0].isdigit()]
             assert len(numbered) >= 1, (
@@ -305,7 +322,10 @@ class TestCrewVerifier:
 
     def test_verification_step_appears_in_trace(self):
         traces_dir = _REPO_ROOT / "traces"
-        run_crew("What is the reorder policy for low stock?")
+        run_crew(
+            "What is the reorder policy for low stock?",
+            approval_fn=_AUTO_APPROVE,
+        )
         log_files = sorted(traces_dir.glob("run_*.log"), key=lambda p: p.stat().st_mtime)
         latest_lines = log_files[-1].read_text(encoding="utf-8").splitlines()
         import json
@@ -327,7 +347,10 @@ class TestCrewVerifier:
 
     def test_save_report_tool_called_by_verifier_not_writer(self):
         traces_dir = _REPO_ROOT / "traces"
-        run_crew("What carrier is used for standard shipments?")
+        run_crew(
+            "What carrier is used for standard shipments?",
+            approval_fn=_AUTO_APPROVE,
+        )
         log_files = sorted(traces_dir.glob("run_*.log"), key=lambda p: p.stat().st_mtime)
         latest_lines = log_files[-1].read_text(encoding="utf-8").splitlines()
         import json
@@ -345,6 +368,24 @@ class TestCrewVerifier:
         for call in save_calls:
             assert "Writer" not in call.get("agent", ""), (
                 f"save_report was called by the Writer — should only be called by the Verifier.\n{call}"
+            )
+
+    # ------------------------------------------------------------------
+    # Approval gate — cancel path (e2e level)
+    # ------------------------------------------------------------------
+    def test_operator_cancel_blocks_save(self):
+        """When the operator enters 'n', no report file should be written."""
+        reports_dir = _REPO_ROOT / "outputs" / "reports"
+        before = _reports_count_before()
+        result = run_crew(
+            "What is the return window for electronics?",
+            approval_fn=_AUTO_CANCEL,
+        )
+        after = len(list(reports_dir.glob("*.md")))
+        # The Verifier should have passed verification but save was cancelled
+        if "cancelled" in result.lower():
+            assert after == before, (
+                "Report was saved even though operator cancelled approval."
             )
 
 

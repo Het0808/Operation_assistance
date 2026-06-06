@@ -1,5 +1,5 @@
 """
-Unit tests for the three MCP tools and the search_utils helper.
+Unit tests for the three MCP tools, search_utils, and the approval gate.
 
 These tests call the tool functions directly — no MCP server process,
 no CrewAI, no network. They verify:
@@ -7,6 +7,7 @@ no CrewAI, no network. They verify:
   - Correct error strings for every invalid-input case
   - save_report file creation and path-traversal rejection
   - search_utils ranking and no-result behaviour
+  - ApprovalSaveTool approve / cancel / invalid-input / interrupt behaviour
 """
 
 from __future__ import annotations
@@ -20,10 +21,11 @@ from pathlib import Path
 import pytest
 
 # ---------------------------------------------------------------------------
-# Path setup — allow imports from server/ without installing the package
+# Path setup — allow imports from server/ and crew/ without installing
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "server"))
+sys.path.insert(0, str(_REPO_ROOT / "crew"))
 
 from search_utils import SearchResult, search_documents as _raw_search
 
@@ -316,3 +318,193 @@ class TestSaveReport:
     def test_max_length_content_accepted(self):
         result = save_report("Valid Title", "x" * 10_000)
         assert not result.startswith("ERROR:")
+
+
+# ===========================================================================
+# ApprovalSaveTool — human approval gate
+# ===========================================================================
+
+# Lazy import — approval_tool imports crewai's BaseTool; skip the class
+# gracefully if crewai is not installed. The rest of test_tools.py is
+# independent and must not be skipped.
+_crewai_missing = pytest.mark.skipif(
+    __import__("importlib").util.find_spec("crewai") is None,
+    reason="crewai not installed — skipping ApprovalSaveTool tests",
+)
+
+# Import only when crewai is available; fall back to a sentinel for collection
+try:
+    from approval_tool import ApprovalSaveTool
+    _approval_tool_available = True
+except Exception:
+    ApprovalSaveTool = None  # type: ignore[assignment,misc]
+    _approval_tool_available = False
+
+
+class _FakeUnderlyingTool:
+    """Minimal stand-in for the MCP save_report tool."""
+
+    def __init__(self):
+        self.calls: list[dict] = []
+
+    def run(self, inputs: dict | str) -> str:
+        if isinstance(inputs, str):
+            import json as _json
+            inputs = _json.loads(inputs)
+        self.calls.append(inputs)
+        return f"REPORT SAVED: outputs/reports/fake_{inputs['title'][:20]}.md"
+
+    def _run(self, title: str = "", content: str = "") -> str:
+        return self.run({"title": title, "content": content})
+
+
+@_crewai_missing
+class TestApprovalGate:
+
+    # ------------------------------------------------------------------
+    # Happy path — user approves
+    # ------------------------------------------------------------------
+    def test_approval_y_delegates_to_underlying(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "y")
+        result = tool._run(title="My Report", content="Finding 1.")
+        assert "REPORT SAVED:" in result
+
+    def test_approval_y_passes_correct_title(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "y")
+        tool._run(title="Title Check", content="Body.")
+        assert fake.calls[0]["title"] == "Title Check"
+
+    def test_approval_y_passes_correct_content(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "y")
+        tool._run(title="T", content="Exact content string.")
+        assert fake.calls[0]["content"] == "Exact content string."
+
+    def test_approval_y_uppercase_accepted(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "Y")
+        result = tool._run(title="T", content="Body.")
+        assert "REPORT SAVED:" in result
+
+    def test_approval_y_with_surrounding_whitespace_accepted(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "  y  ")
+        result = tool._run(title="T", content="Body.")
+        assert "REPORT SAVED:" in result
+
+    # ------------------------------------------------------------------
+    # User cancels
+    # ------------------------------------------------------------------
+    def test_approval_n_returns_cancelled(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "n")
+        result = tool._run(title="My Report", content="Finding 1.")
+        assert "cancelled" in result.lower()
+
+    def test_approval_n_does_not_call_underlying(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "n")
+        tool._run(title="My Report", content="Finding 1.")
+        assert len(fake.calls) == 0
+
+    def test_approval_n_uppercase_cancels(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "N")
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    def test_approval_n_with_whitespace_cancels(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "  n  ")
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    # ------------------------------------------------------------------
+    # Invalid input — re-prompts until valid response
+    # ------------------------------------------------------------------
+    def test_invalid_then_y_eventually_approves(self):
+        fake = _FakeUnderlyingTool()
+        responses = iter(["maybe", "sure", "yes", "y"])
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: next(responses))
+        result = tool._run(title="T", content="Body.")
+        assert "REPORT SAVED:" in result
+
+    def test_invalid_then_n_eventually_cancels(self):
+        fake = _FakeUnderlyingTool()
+        responses = iter(["oops", "nope", "n"])
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: next(responses))
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+        assert len(fake.calls) == 0
+
+    def test_empty_string_is_invalid_input(self):
+        fake = _FakeUnderlyingTool()
+        responses = iter(["", "n"])
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: next(responses))
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    def test_numeric_input_is_invalid(self):
+        fake = _FakeUnderlyingTool()
+        responses = iter(["1", "0", "n"])
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: next(responses))
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    # ------------------------------------------------------------------
+    # Interrupt / EOF handling
+    # ------------------------------------------------------------------
+    def test_eof_error_returns_cancelled(self):
+        fake = _FakeUnderlyingTool()
+
+        def raise_eof(_: str) -> str:
+            raise EOFError
+
+        tool = ApprovalSaveTool(underlying=fake, input_fn=raise_eof)
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    def test_eof_does_not_call_underlying(self):
+        fake = _FakeUnderlyingTool()
+
+        def raise_eof(_: str) -> str:
+            raise EOFError
+
+        tool = ApprovalSaveTool(underlying=fake, input_fn=raise_eof)
+        tool._run(title="T", content="Body.")
+        assert len(fake.calls) == 0
+
+    def test_keyboard_interrupt_returns_cancelled(self):
+        fake = _FakeUnderlyingTool()
+
+        def raise_interrupt(_: str) -> str:
+            raise KeyboardInterrupt
+
+        tool = ApprovalSaveTool(underlying=fake, input_fn=raise_interrupt)
+        result = tool._run(title="T", content="Body.")
+        assert "cancelled" in result.lower()
+
+    def test_keyboard_interrupt_does_not_call_underlying(self):
+        fake = _FakeUnderlyingTool()
+
+        def raise_interrupt(_: str) -> str:
+            raise KeyboardInterrupt
+
+        tool = ApprovalSaveTool(underlying=fake, input_fn=raise_interrupt)
+        tool._run(title="T", content="Body.")
+        assert len(fake.calls) == 0
+
+    # ------------------------------------------------------------------
+    # Tool metadata
+    # ------------------------------------------------------------------
+    def test_tool_name_matches_mcp_tool(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "n")
+        assert tool.name == "save_report"
+
+    def test_tool_description_mentions_approval(self):
+        fake = _FakeUnderlyingTool()
+        tool = ApprovalSaveTool(underlying=fake, input_fn=lambda _: "n")
+        assert "approval" in tool.description.lower()
