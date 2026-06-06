@@ -1,8 +1,17 @@
 """
 Operations Assistant crew.
-Three agents — Researcher, Analyst, Writer — share one MCP server
+Four agents — Researcher, Analyst, Writer, Verifier — share one MCP server
 via MCPServerAdapter over stdio and answer a business question with
-a sourced markdown report.
+a verified, sourced markdown report.
+
+Workflow
+--------
+Researcher  → collects raw document evidence
+Analyst     → cross-references evidence against CSV records
+Writer      → drafts a sourced markdown report (does NOT save it)
+Verifier    → checks every claim in the draft against retrieved evidence;
+              calls save_report only if all claims are supported,
+              otherwise returns "Verification Failed" with unsupported statements listed
 """
 
 from __future__ import annotations
@@ -39,8 +48,9 @@ _GROUNDING_RULE = (
 # ---------------------------------------------------------------------------
 def run_crew(question: str) -> str:
     """
-    Run the three-agent crew against the given question.
-    Returns the Writer's final answer string.
+    Run the four-agent crew against the given question.
+    Returns the Verifier's final answer string (either a saved-report confirmation
+    or a Verification Failed message with unsupported statements listed).
     The MCP server subprocess is always stopped in the finally block.
     """
     if not question or not question.strip():
@@ -129,23 +139,55 @@ def run_crew(question: str) -> str:
             role="Operations Report Writer",
             goal=(
                 "Synthesise the Analyst's verified fact set into a clear, concise "
-                "markdown report that directly answers the user's question. Every "
-                "factual claim must cite its source. Save the finished report using "
-                "save_report and return the saved file path alongside a brief summary."
+                "markdown report draft that directly answers the user's question. "
+                "Every factual claim must cite its source. "
+                "Output the complete draft as plain text — do NOT call save_report. "
+                "The Verifier will review and save the report."
             ),
             backstory=(
                 "You are a clear, precise technical writer who produces operational "
                 "briefings for senior managers who have no patience for vague answers. "
                 "You know that a report without sources is an opinion, not a finding. "
                 "You receive a verified fact set from the Analyst and your only job is "
-                "to turn it into a readable report — no new research, no invented details. "
+                "to turn it into a readable markdown draft — no new research, no invented details. "
                 "If the fact set contains a gap flagged by the Analyst, you include it "
-                "honestly in the report rather than papering over it. The report is not "
-                "finished until save_report has been called and returned a confirmation. "
+                "honestly rather than papering over it. "
+                "Do NOT call save_report — output the draft text only. "
+                "A Verifier will check every claim before the report is saved. "
                 f"{_GROUNDING_RULE}"
             ),
-            tools=[report_tool],
+            tools=[],
             max_iter=3,
+            verbose=True,
+        )
+
+        verifier = Agent(
+            role="Operations Report Verifier",
+            goal=(
+                "Review the Writer's draft report claim by claim. "
+                "For every factual statement, confirm it is supported by a source citation "
+                "that appears in the Analyst's evidence. Use search_documents to spot-check "
+                "any claim that lacks a clear citation or looks suspicious. "
+                "If ALL claims are supported, output 'Verification Passed', then call "
+                "save_report with the verified report. "
+                "If ANY claim is unsupported or hallucinated, output 'Verification Failed' "
+                "followed by a numbered list of every unsupported statement — do NOT save."
+            ),
+            backstory=(
+                "You are a rigorous quality-control analyst whose entire job is to catch "
+                "fabricated or unsourced claims before they reach a manager. You have seen "
+                "AI systems confidently state things that never appeared in any source document, "
+                "and you know that a single uncited claim destroys trust in the whole report. "
+                "You read the draft line by line. For each factual statement you ask: "
+                "'Is there a citation? Does the cited source actually say this?' "
+                "You use search_documents to verify any claim you are uncertain about. "
+                "You do not care about writing quality — only about whether every claim "
+                "is traceable to the retrieved evidence. "
+                "You never save a report that contains even one unsupported statement. "
+                f"{_GROUNDING_RULE}"
+            ),
+            tools=[search_tool, report_tool],
+            max_iter=6,
             verbose=True,
         )
 
@@ -202,7 +244,7 @@ def run_crew(question: str) -> str:
             description=(
                 f"User question: {question}\n\n"
                 "You will receive the Analyst's verified fact set as context.\n\n"
-                "Write a markdown report with this structure:\n"
+                "Write a markdown report DRAFT with this exact structure:\n"
                 "  ## Answer\n"
                 "  One paragraph directly answering the question.\n\n"
                 "  ## Supporting Evidence\n"
@@ -212,28 +254,62 @@ def run_crew(question: str) -> str:
                 "  ## Gaps and Unverified Items\n"
                 "  Honest list of anything the Analyst flagged as unverified or "
                 "  conflicting. If there are none, write 'None.'\n\n"
-                "Rules:\n"
+                "IMPORTANT RULES:\n"
                 "- Use only facts from the Analyst's fact set. No new research.\n"
-                "- Do not include any claim without a source citation.\n"
-                "- Call save_report exactly once when the report is complete.\n\n"
+                "- Every factual claim must end with a (source: ...) citation.\n"
+                "- Do NOT call save_report — output the draft text only.\n"
+                "- The Verifier will check your draft and save it if it passes.\n\n"
                 f"{_GROUNDING_RULE}"
             ),
             expected_output=(
-                "The path to the saved report file as returned by save_report, "
-                "followed by a one-paragraph plain-English summary of the findings "
-                "that could be read aloud to a manager. "
-                "Every claim in the summary must be traceable to the saved report."
+                "A complete markdown report draft as plain text, following the "
+                "## Answer / ## Supporting Evidence / ## Gaps and Unverified Items "
+                "structure. Every factual claim includes a (source: ...) citation. "
+                "No save_report call. No file path. Draft text only."
             ),
             agent=writer,
             context=[analysis_task],
+        )
+
+        verify_task = Task(
+            description=(
+                f"User question: {question}\n\n"
+                "You will receive the Writer's draft report as context.\n\n"
+                "Your job is to verify EVERY factual claim in the draft:\n"
+                "1. Read the draft line by line.\n"
+                "2. For each factual statement, check it has a (source: ...) citation.\n"
+                "3. If a claim has no citation, mark it as UNSUPPORTED.\n"
+                "4. If a claim has a citation but you are uncertain it is accurate, "
+                "   call search_documents to spot-check it against the source document.\n"
+                "5. If search_documents returns no match for a cited claim, mark it UNSUPPORTED.\n\n"
+                "DECISION:\n"
+                "- If ALL claims are supported:\n"
+                "  Output the line 'Verification Passed' on its own line.\n"
+                "  Then call save_report with title and the full verified report content.\n"
+                "  Then output the save_report confirmation and a one-paragraph summary.\n\n"
+                "- If ANY claim is unsupported or hallucinated:\n"
+                "  Output 'Verification Failed' on its own line.\n"
+                "  Then output a numbered list of every unsupported statement.\n"
+                "  Do NOT call save_report.\n\n"
+                f"{_GROUNDING_RULE}"
+            ),
+            expected_output=(
+                "Either:\n"
+                "  'Verification Passed' followed by the save_report confirmation "
+                "  (REPORT SAVED: ...) and a one-paragraph plain-English summary, OR\n"
+                "  'Verification Failed' followed by a numbered list of every "
+                "  unsupported statement found in the draft."
+            ),
+            agent=verifier,
+            context=[analysis_task, write_task],
         )
 
         # -------------------------------------------------------------------
         # Crew
         # -------------------------------------------------------------------
         crew = Crew(
-            agents=[researcher, analyst, writer],
-            tasks=[research_task, analysis_task, write_task],
+            agents=[researcher, analyst, writer, verifier],
+            tasks=[research_task, analysis_task, write_task, verify_task],
             process=Process.sequential,
             verbose=True,
             step_callback=tracer.step_callback,

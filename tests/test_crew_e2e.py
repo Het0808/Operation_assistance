@@ -262,6 +262,93 @@ class TestCrewSideEffects:
 
 
 # ===========================================================================
+# E2E: Verifier agent behaviour
+# ===========================================================================
+class TestCrewVerifier:
+
+    def test_verification_passed_in_result_for_grounded_question(self):
+        result = run_crew("What is the return window for electronics?")
+        assert "Verification Passed" in result, (
+            f"Expected 'Verification Passed' in result.\nResult:\n{result}"
+        )
+
+    def test_report_saved_only_after_verification_passes(self):
+        reports_dir = _REPO_ROOT / "outputs" / "reports"
+        before = _reports_count_before()
+        result = run_crew("What is the free shipping threshold?")
+        after = len(list(reports_dir.glob("*.md")))
+        if "Verification Passed" in result:
+            assert after > before, (
+                "Verification Passed but no new report file was written."
+            )
+
+    def test_verification_failed_blocks_save_on_bad_question(self):
+        reports_dir = _REPO_ROOT / "outputs" / "reports"
+        before = _reports_count_before()
+        # A nonsense question should produce no evidence and force Verification Failed
+        result = run_crew("What is our policy on teleportation devices?")
+        after = len(list(reports_dir.glob("*.md")))
+        if "Verification Failed" in result:
+            assert after == before, (
+                "Verification Failed but a report was saved — save_report should not have been called."
+            )
+
+    def test_verification_failed_lists_unsupported_statements(self):
+        result = run_crew("What is our policy on teleportation devices?")
+        if "Verification Failed" in result:
+            # The failure report must list at least one unsupported statement
+            lines = result.splitlines()
+            numbered = [l for l in lines if l.strip() and l.strip()[0].isdigit()]
+            assert len(numbered) >= 1, (
+                "Verification Failed but no unsupported statements were listed."
+            )
+
+    def test_verification_step_appears_in_trace(self):
+        traces_dir = _REPO_ROOT / "traces"
+        run_crew("What is the reorder policy for low stock?")
+        log_files = sorted(traces_dir.glob("run_*.log"), key=lambda p: p.stat().st_mtime)
+        latest_lines = log_files[-1].read_text(encoding="utf-8").splitlines()
+        import json
+        agents_seen = set()
+        for line in latest_lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+                agent = obj.get("agent", "")
+                if agent:
+                    agents_seen.add(agent)
+            except json.JSONDecodeError:
+                pass
+        assert any("Verifier" in a or "verifier" in a.lower() for a in agents_seen), (
+            f"No Verifier agent events found in trace. Agents seen: {agents_seen}"
+        )
+
+    def test_save_report_tool_called_by_verifier_not_writer(self):
+        traces_dir = _REPO_ROOT / "traces"
+        run_crew("What carrier is used for standard shipments?")
+        log_files = sorted(traces_dir.glob("run_*.log"), key=lambda p: p.stat().st_mtime)
+        latest_lines = log_files[-1].read_text(encoding="utf-8").splitlines()
+        import json
+        save_calls = []
+        for line in latest_lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+                if obj.get("event") == "TOOL_CALL" and obj.get("tool") == "save_report":
+                    save_calls.append(obj)
+            except json.JSONDecodeError:
+                pass
+        for call in save_calls:
+            assert "Writer" not in call.get("agent", ""), (
+                f"save_report was called by the Writer — should only be called by the Verifier.\n{call}"
+            )
+
+
+# ===========================================================================
 # E2E: input validation at crew entry point
 # ===========================================================================
 class TestCrewInputValidation:
