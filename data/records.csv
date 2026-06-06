@@ -1,0 +1,21 @@
+order_id,customer_account,account_tier,sku,product_name,quantity,unit_price,order_total,order_date,dispatch_date,carrier,tracking_number,delivery_status,return_requested,notes
+ORD-00871,ACC-1102,Standard,OF-20010,A4 Copy Paper 80gsm (5-ream case),3,18.50,55.50,2025-10-01,2025-10-02,FastFreight,FF-8821044,Delivered,No,
+ORD-00882,ACC-4455,Gold,EL-10087,Bluetooth Noise-Cancelling Headphones,1,189.00,189.00,2025-10-03,2025-10-04,FastFreight,FF-8821198,Delivered,No,Firmware v1.2 unit confirmed
+ORD-00892,ACC-7821,Standard,EL-10042,Wireless Charging Pad 15W,1,34.99,34.99,2025-10-08,2025-10-09,FastFreight,FF-8821355,Delivered,Yes,Defective batch WCP-2023; replaced under ORD-00931
+ORD-00901,ACC-2230,Standard,OF-20045,Ballpoint Pen Multipack 10-pack,2,6.99,13.98,2025-10-10,2025-10-11,FastFreight,FF-8821410,Delivered,No,
+ORD-00912,ACC-5567,Platinum,EL-10115,USB-C 65W Laptop Charger,2,44.99,89.98,2025-10-12,2025-10-13,FastFreight,FF-8821502,Delivered,No,Free shipping applied (Platinum)
+ORD-00925,ACC-3318,Standard,OF-20201,Black Ink Cartridge Compatible 3-pack,4,12.49,49.96,2025-10-15,2025-10-17,BackupCarrier,BC-3301088,Delivered,No,Overflow carrier used
+ORD-00931,ACC-7821,Standard,EL-10042,Wireless Charging Pad 15W,1,0.00,0.00,2025-10-16,2025-10-16,FastFreight,FF-8821611,Delivered,No,Replacement for ORD-00892; no charge
+ORD-00944,ACC-8810,Gold,OF-20310,Ergonomic Desk Organiser,5,22.00,110.00,2025-10-18,2025-10-20,FastFreight,FF-8821790,Delivered,No,
+ORD-00957,ACC-1102,Standard,OF-99001,Paper and Ink Bundle (OF-20010+OF-20201),2,29.00,58.00,2025-10-21,2025-10-22,FastFreight,FF-8821854,Delivered,No,Bundle SKU; assembled on pick
+ORD-00970,ACC-6643,Standard,EL-10115,USB-C 65W Laptop Charger,1,44.99,44.99,2025-10-24,2025-10-27,FastFreight,FF-8821991,Delivered,Yes,Customer claims not compatible with laptop; return pending inspection
+ORD-00985,ACC-2991,Standard,OF-20045,Ballpoint Pen Multipack 10-pack,10,6.99,69.90,2025-10-28,2025-10-29,FastFreight,FF-8822104,Delivered,No,Bulk order; free shipping threshold not met ($69.90)
+ORD-01001,ACC-5567,Platinum,EL-10087,Bluetooth Noise-Cancelling Headphones,3,189.00,567.00,2025-11-01,2025-11-03,FastFreight,FF-8822301,Delivered,No,Finance sign-off not required (Platinum auto-approved under $2k)
+ORD-01020,ACC-4112,Standard,OF-20010,A4 Copy Paper 80gsm (5-ream case),6,18.50,111.00,2025-11-04,2025-11-05,FastFreight,FF-8822445,Delivered,No,Free shipping applied ($111 > $75 threshold)
+ORD-01035,ACC-7700,Gold,EL-10042,Wireless Charging Pad 15W,2,34.99,69.98,2025-11-06,2025-11-07,FastFreight,FF-8822509,In Transit,No,
+ORD-01047,ACC-3340,Gold,OF-20045,Ballpoint Pen Multipack 10-pack,5,6.99,34.95,2025-11-08,2025-11-09,FastFreight,FF-8822618,Delivered,No,Mispick resolved; correct items resent under ORD-01063
+ORD-01063,ACC-3340,Gold,OF-20045,Ballpoint Pen Multipack 10-pack,5,0.00,0.00,2025-11-09,2025-11-09,FastFreight,FF-8822701,Delivered,No,Replacement for mispick ORD-01047; expedited no charge
+ORD-01089,ACC-9900,Standard,OF-20201,Black Ink Cartridge Compatible 3-pack,2,12.49,24.98,2025-11-12,2025-11-14,BackupCarrier,BC-3301204,Delivered,No,
+ORD-01120,ACC-1540,Standard,OF-20400,Seasonal Planner 2024 (FINAL_SALE),1,5.99,5.99,2025-11-14,2025-11-15,FastFreight,FF-8822890,Delivered,No,FINAL_SALE item; no returns accepted
+ORD-01201,ACC-9104,Standard,EL-10087,Bluetooth Noise-Cancelling Headphones,1,189.00,189.00,2025-11-10,2025-11-12,FastFreight,FF-8823010,Delivered,Yes,Cracked headband reported; ticket ST-0067 escalated to Ops Manager
+ORD-01215,ACC-2230,Standard,EL-10115,USB-C 65W Laptop Charger,1,44.99,44.99,2025-11-19,2025-11-21,FastFreight,FF-8823155,Pending Dispatch,No,Expedited shipping selected

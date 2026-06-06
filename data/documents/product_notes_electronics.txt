@@ -1,0 +1,42 @@
+DOCUMENT: Product Notes — Electronics Range
+CATEGORY: Product Notes
+LAST UPDATED: 2025-11-10
+OWNER: Product Manager
+
+---
+
+OVERVIEW
+This document covers handling, storage, and known issues for the electronics product range stocked
+in the main warehouse. SKU prefix for all electronics: EL-XXXXX.
+
+STORAGE REQUIREMENTS
+- Temperature: 10°C to 30°C. Do not store near loading bay doors in winter.
+- Humidity: 30%–70% RH. Electronics shelf (Zone C) is climate-monitored.
+- Keep away from magnetic equipment and heavy machinery.
+
+HIGH-VELOCITY PRODUCTS (current top sellers)
+1. EL-10042 — Wireless Charging Pad (15W)
+   - Reorder point: 20 units. Supplier B lead time: 12 business days.
+   - Known issue: units manufactured before batch B24-07 may not charge cases thicker than 4 mm.
+     Affected units have a serial number starting with WCP-2023. Replace on request, no questions asked.
+
+2. EL-10087 — Bluetooth Noise-Cancelling Headphones
+   - Reorder point: 15 units. Supplier B lead time: 14 business days.
+   - Firmware v1.2 (shipped from Oct 2025 onward) fixes random disconnect bug in v1.1.
+     Customers with v1.1 headphones should be directed to the firmware update page.
+
+3. EL-10115 — USB-C 65W Laptop Charger (universal)
+   - Reorder point: 25 units. Supplier A lead time: 6 business days.
+   - Compatible with most laptops; not compatible with Apple MagSafe-only models.
+     Product listing updated Oct 2025 to clarify compatibility; returns from before that date are accepted.
+
+OVERSIZED FLAG
+No current electronics items are flagged OVERSIZED. Items above 2 kg are noted in the catalog
+but do not exceed the freight dimension threshold.
+
+WARRANTY NOTES
+All electronics carry a 12-month manufacturer warranty.
+Warranty claims go directly through the manufacturer; support provides the manufacturer contact
+and RMA reference if requested. Do not process manufacturer warranty claims through the returns flow.
+
+RELATED DOCUMENTS: returns_and_refunds_policy.txt, low_stock_reorder_policy.txt

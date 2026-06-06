@@ -1,0 +1,48 @@
+DOCUMENT: Product Damage Claims Procedure
+CATEGORY: Policy / Procedure
+LAST UPDATED: 2025-10-30
+OWNER: Customer Support Lead
+
+---
+
+PURPOSE
+Provide a clear, consistent process for handling claims where a product arrives damaged,
+is defective out of the box, or is lost in transit.
+
+STEP 1 — CUSTOMER REPORTS DAMAGE
+Customer contacts support@opsco.internal within 72 hours of confirmed delivery.
+Subject line must include the order ID (format: ORD-XXXXX).
+Customer must attach:
+  (a) At least two photographs of the damage.
+  (b) A photograph of the outer packaging.
+  (c) The delivery note or confirmation email.
+
+STEP 2 — INITIAL ASSESSMENT (within 1 business day)
+Support agent reviews the claim and categorises it:
+  - Category A: Clear carrier damage (packaging crushed, item broken). Approve replacement immediately.
+  - Category B: Possible misuse or ambiguous damage. Escalate to Inventory Manager for inspection request.
+  - Category C: Item works but has cosmetic damage only. Offer a 15% partial refund or keep-and-replace.
+
+STEP 3 — RESOLUTION OPTIONS
+For approved Category A claims:
+  - Replacement shipped within 2 business days at no cost.
+  - Customer does not need to return the damaged item unless unit value > $300.
+
+For Category B claims under investigation:
+  - A prepaid return label is issued. Item must be received at the warehouse within 10 business days.
+  - If confirmed defective: full replacement or refund at customer's choice.
+  - If found to be customer-caused damage: claim denied; customer notified with photo evidence.
+
+For Category C (cosmetic only):
+  - Partial refund processed within 3 business days, or replacement dispatched on customer's preference.
+
+STEP 4 — CARRIER CLAIM
+For Category A damage, the support team files a parallel claim with the carrier.
+Carrier claim reference number must be added to the order notes.
+Carrier typically resolves within 14–21 business days; reimbursement credited to operations budget.
+
+ESCALATION
+If a customer disputes a denied claim, the issue is escalated to the Operations Manager.
+Final decisions at that level are binding.
+
+RELATED DOCUMENTS: returns_and_refunds_policy.txt, shipping_and_delivery_policy.txt

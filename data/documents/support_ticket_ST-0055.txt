@@ -1,0 +1,39 @@
+DOCUMENT: Support Ticket ST-0055
+CATEGORY: Support Ticket
+STATUS: Resolved
+DATE OPENED: 2025-11-02
+DATE CLOSED: 2025-11-05
+AGENT: Marcus T.
+CUSTOMER ACCOUNT: ACC-3340 (account tier: Gold)
+
+---
+
+ORDER REFERENCE: ORD-01047
+PRODUCT: OF-20045 — Ballpoint Pen Multipack (10-pack)
+ORDER VALUE: $34.00
+
+ISSUE REPORTED
+Customer received the wrong item. Ordered 5 × OF-20045 (pen multipacks) but received
+5 × OF-20310 (ergonomic desk organisers) instead.
+Customer runs a small office and urgently needed the pens.
+
+INVESTIGATION
+Agent pulled dispatch record from OMS. Confirmed mispick at packing station — scanner log shows
+OF-20310 was scanned instead of OF-20045. Staff member ID: WH-14.
+Supervisor notified per mispick procedure in warehouse_dispatch_procedure.txt.
+This is the second mispick logged against WH-14 in November.
+
+RESOLUTION
+Correct order (5 × OF-20045) dispatched same day under ORD-01063 (expedited, no charge).
+Prepaid return label emailed to customer for the desk organisers.
+Customer is Gold tier — restocking fee waived per returns_and_refunds_policy.txt.
+Customer confirmed receipt of correct items on 2025-11-04.
+
+OUTCOME
+Customer satisfied. Return of desk organisers received at warehouse 2025-11-05; items restocked.
+Ticket closed. WH-14 flagged for retraining review (2 mispicks in one month triggers retraining
+per warehouse_dispatch_procedure.txt).
+
+NOTES FOR RECORD
+Recommend supervisor review picking station layout — OF-20045 and OF-20310 are stored in adjacent
+bins on Shelf Row 7. Relabelling or bin separation may prevent future confusion.

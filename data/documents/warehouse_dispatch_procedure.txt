@@ -1,0 +1,44 @@
+DOCUMENT: Warehouse Dispatch Procedure
+CATEGORY: Procedure
+LAST UPDATED: 2025-08-12
+OWNER: Warehouse Supervisor
+
+---
+
+PURPOSE
+Standardise the pick, pack, and dispatch workflow to ensure accurate and timely shipments.
+
+DAILY SCHEDULE
+06:00 — Warehouse opens; staff briefing and shift allocation.
+07:00 — Order queue downloaded from the order management system (OMS).
+07:30 — Picking begins. Priority order: Expedited > Standard > Bulk freight.
+12:00 — Midday cut-off for same-day expedited dispatch.
+14:00 — Final standard packing complete.
+15:00 — Carrier collection (FastFreight Logistics van arrives).
+16:30 — End-of-day inventory count for high-velocity items.
+17:00 — Warehouse closes.
+
+PICKING PROCESS
+1. Picker receives a digital pick list on the handheld scanner.
+2. Each item is scanned at the shelf location and again at the packing station.
+3. A mismatch alert (wrong SKU or quantity) halts the pick and triggers a supervisor check.
+4. Back-ordered items are flagged in the OMS and the customer is notified by email automatically.
+
+PACKING STANDARDS
+- Use the smallest box that fits the item with at least 5 cm padding on each side.
+- Fragile items: double-box and mark outer packaging FRAGILE.
+- Batteries: comply with carrier dangerous goods policy (form DG-3 must accompany shipment).
+- Each box must contain: item(s), packing slip, and returns label.
+
+DISPATCH RECORDS
+Every dispatched order is recorded in the OMS with:
+  - Dispatch timestamp
+  - Carrier name and tracking number
+  - Staff member ID who completed packing
+
+ERRORS AND MISPICKS
+A mispick discovered after dispatch must be reported to the supervisor within 30 minutes.
+A replacement order is raised immediately and a prepaid return label is sent to the customer.
+Mispick incidents are logged monthly; three mispicks in a month by the same staff member triggers retraining.
+
+RELATED DOCUMENTS: low_stock_reorder_policy.txt, shipping_and_delivery_policy.txt

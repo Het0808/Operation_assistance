@@ -1,0 +1,46 @@
+DOCUMENT: Product Notes — Office Supplies Range
+CATEGORY: Product Notes
+LAST UPDATED: 2025-10-05
+OWNER: Product Manager
+
+---
+
+OVERVIEW
+Covers the office supplies range. SKU prefix: OF-XXXXX.
+This range is high-volume, low-margin. Fulfilment speed and accuracy are the priority.
+
+STORAGE REQUIREMENTS
+- Ambient temperature and humidity acceptable for all items.
+- Paper products (OF-20010 to OF-20099): keep away from damp areas; pallets must be off the floor.
+- Ink cartridges (OF-20200 series): do not freeze; shelf life 18 months from manufacture date.
+  Rotate stock using FIFO. Expired cartridges must be quarantined and returned to Supplier A.
+
+HIGH-VELOCITY PRODUCTS
+1. OF-20010 — A4 Copy Paper, 80gsm (500 sheets/ream)
+   - Sold in cases of 5 reams. Reorder point: 50 cases.
+   - No known issues. Standard item; qualifies for free shipping threshold calculation.
+
+2. OF-20045 — Ballpoint Pen Multipack (10-pack, blue/black/red)
+   - Reorder point: 80 units. Fast mover — check stock daily.
+   - Supplier A has occasional lead time extension to 8 days in Q4 due to demand surge.
+     Place early reorders in October to buffer against this.
+
+3. OF-20201 — Black Ink Cartridge (compatible, 3-pack)
+   - Reorder point: 30 units.
+   - IMPORTANT: Compatibility list covers HP, Canon, and Epson models only (see compatibility sheet
+     attached to product listing). Returns accepted if customer purchased an incompatible model
+     and the cartridge is unopened.
+
+4. OF-20310 — Ergonomic Desk Organiser
+   - Reorder point: 15 units.
+   - Comes flat-packed. Assembly instructions are in the box. No tool required.
+   - Minor cosmetic variation between batches (colour shade) is expected and not a defect.
+
+BUNDLE NOTE
+OF-20010 + OF-20201 are frequently purchased together. A pre-bundled SKU (OF-99001) is available
+at a $2 discount. Inventory is tracked separately per component; the bundle is assembled on pick.
+
+FINAL_SALE ITEMS
+OF-20400 series (seasonal planners, prior year) are marked FINAL_SALE. No returns.
+
+RELATED DOCUMENTS: warehouse_dispatch_procedure.txt, low_stock_reorder_policy.txt

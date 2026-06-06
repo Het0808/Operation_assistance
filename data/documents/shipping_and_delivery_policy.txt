@@ -1,0 +1,44 @@
+DOCUMENT: Shipping and Delivery Policy
+CATEGORY: Policy
+LAST UPDATED: 2025-10-15
+OWNER: Operations Manager
+
+---
+
+SCOPE
+Covers all outbound shipments from the main warehouse to domestic customers.
+International shipping is handled by a separate third-party arrangement and is out of scope here.
+
+STANDARD SHIPPING
+- Processing time: 1–2 business days after order confirmation.
+- Delivery window: 5–7 business days after dispatch.
+- Carrier: FastFreight Logistics (primary), BackupCarrier Co. (overflow).
+- Tracking numbers are emailed automatically within 24 hours of dispatch.
+
+EXPEDITED SHIPPING
+- Available for an additional $12.99 per order.
+- Processing time: same day if order placed before 13:00 local warehouse time.
+- Delivery window: 2–3 business days after dispatch.
+- Not available for oversized items (any dimension > 80 cm or weight > 25 kg).
+
+OVERSIZED ITEMS
+Items flagged OVERSIZED in the product catalog ship via freight only.
+Freight delivery windows: 7–14 business days.
+A delivery appointment must be scheduled; the warehouse will contact the customer within 2 business days
+of dispatch to arrange a time slot.
+
+FREE SHIPPING THRESHOLD
+Orders with a subtotal of $75 or more qualify for free standard shipping.
+The threshold applies after any discounts are applied but before taxes.
+
+ADDRESS CHANGES
+Address changes are accepted up to 1 hour after order confirmation.
+After that window, the order is locked for dispatch and cannot be rerouted.
+Customers must contact support@opsco.internal immediately if an address error is made.
+
+FAILED DELIVERIES
+If a delivery attempt fails twice, the package is held at the carrier depot for 5 business days.
+If unclaimed, it is returned to the warehouse and the order is flagged for refund processing
+minus a $8.50 return-freight fee.
+
+RELATED DOCUMENTS: returns_and_refunds_policy.txt, warehouse_dispatch_procedure.txt

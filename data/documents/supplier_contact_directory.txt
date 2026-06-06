@@ -1,0 +1,64 @@
+DOCUMENT: Supplier Contact Directory
+CATEGORY: Reference
+LAST UPDATED: 2025-11-01
+OWNER: Inventory Manager
+
+---
+
+NOTE: This directory is for internal use only. Do not share supplier contact details externally.
+
+---
+
+SUPPLIER A — General Goods (Domestic)
+Company:     PrimeSource Wholesale Ltd.
+Account ID:  SUP-A01
+Contact:     Jamie Osei (Account Manager)
+Email:       j.osei@primesource.example
+Phone:       +1 555-0142
+Lead time:   5–7 business days (standard), up to 8 days in Q4
+Minimum order: $150
+Payment terms: Net-30
+Notes: Preferred supplier for office supplies and general warehouse consumables.
+       Q4 lead time extension typically applies October–December. Place buffer orders in early October.
+
+---
+
+SUPPLIER B — Electronics
+Company:     TechLink Distribution Inc.
+Account ID:  SUP-B02
+Contact:     Priya Nambiar (Sales Rep)
+Email:       priya.n@techlink.example
+Phone:       +1 555-0278
+Lead time:   10–14 business days
+Minimum order: $300
+Payment terms: Net-45
+Notes: Sole supplier for EL-10042, EL-10087, EL-10115.
+       All electronics returns and warranty escalations go through Priya.
+       Current contract valid until 2026-06-30; renewal discussions due 2026-03-01.
+
+---
+
+SUPPLIER C — Bulk / Overseas
+Company:     GlobalStock Partners
+Account ID:  SUP-C03
+Contact:     Wei Zhang (Export Manager)
+Email:       w.zhang@globalstock.example
+Phone:       +86 21 5550-3391
+Lead time:   21–28 business days
+Minimum order: $1,000 (bulk pallets only)
+Payment terms: 50% upfront, 50% on delivery
+Notes: Used for high-volume, low-cost commodity items only.
+       All purchase orders above $2,000 require Finance sign-off (see low_stock_reorder_policy.txt).
+       Import documentation handled by GlobalStock; customs broker on file: FastClear Ltd.
+
+---
+
+CARRIER CONTACTS
+FastFreight Logistics (primary carrier)
+  Dispatch liaison: ops@fastfreight.example | +1 555-0399
+  Damage claims:   claims@fastfreight.example (reference format: FF-CLAIM-XXXXX)
+
+BackupCarrier Co. (overflow)
+  General contact: dispatch@backupcarrier.example | +1 555-0501
+
+RELATED DOCUMENTS: low_stock_reorder_policy.txt, shipping_and_delivery_policy.txt

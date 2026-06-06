@@ -1,0 +1,41 @@
+DOCUMENT: Support Ticket ST-0067
+CATEGORY: Support Ticket
+STATUS: Escalated — Pending Operations Manager Decision
+DATE OPENED: 2025-11-18
+DATE CLOSED: —
+AGENT: Sarah K.
+CUSTOMER ACCOUNT: ACC-9104 (account tier: Standard)
+
+---
+
+ORDER REFERENCE: ORD-01201
+PRODUCT: EL-10087 — Bluetooth Noise-Cancelling Headphones
+ORDER VALUE: $189.00
+
+ISSUE REPORTED
+Customer states headphones were delivered with a cracked headband. Customer did not report within
+72 hours — claim submitted 6 days after delivery (2025-11-12 delivery, claim on 2025-11-18).
+Customer says they did not notice the crack immediately as it was hidden under the packaging foam.
+Customer provided two photos: one of the cracked headband, one of the outer box (undamaged).
+
+INVESTIGATION
+Agent reviewed photos. Crack appears consistent with internal packaging pressure rather than
+external impact (inner foam shows compression mark matching crack location).
+Outer box shows no damage — carrier likely not at fault.
+Policy (product_damage_claims_procedure.txt) requires claims within 72 hours; customer is outside
+the window. However, damage appears to be a packaging/manufacturing defect, not customer-caused.
+
+AGENT ASSESSMENT
+Standard policy would deny the claim (outside 72-hour window).
+However, the nature of the damage (hidden under foam, not immediately visible) and the photo
+evidence suggest this is a legitimate manufacturing defect.
+Agent is not authorised to approve a replacement outside the 72-hour window without escalation.
+
+ESCALATION TO OPERATIONS MANAGER
+Ticket escalated on 2025-11-18. Awaiting decision.
+Customer notified of escalation and estimated 2-business-day response time.
+
+NOTES FOR RECORD
+Suggest Operations Manager consider updating the damage claims procedure to add a clause for
+defects that are not reasonably visible upon unpacking. Current 72-hour window may be too short
+for hidden internal defects.

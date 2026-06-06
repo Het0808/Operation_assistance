@@ -1,0 +1,39 @@
+DOCUMENT: Returns and Refunds Policy
+CATEGORY: Policy
+LAST UPDATED: 2025-11-01
+OWNER: Operations Manager
+
+---
+
+SCOPE
+This policy applies to all customer orders fulfilled by the warehouse. It covers physical goods only.
+Digital licenses and consumable items (opened packaging) are excluded.
+
+RETURN WINDOW
+- Standard items: 30 days from confirmed delivery date.
+- Electronics and high-value items (unit price > $500): 15 days from confirmed delivery date.
+- Clearance or final-sale items: No returns accepted. Items are marked FINAL_SALE in the product catalog.
+
+CONDITION REQUIREMENTS
+Items must be returned in original packaging with all accessories included.
+Items showing signs of physical damage caused by the customer, misuse, or tampering are not eligible.
+Missing accessories will result in a partial refund. Deduction schedule:
+  - Missing power adapter: deduct $15
+  - Missing user manual: deduct $5
+  - Missing original box: deduct $10
+
+REFUND PROCESSING
+Refunds are issued to the original payment method within 7 business days of the warehouse receiving
+and inspecting the returned item.
+If the original payment method is no longer active, a store credit voucher is issued instead.
+
+EXCEPTIONS
+If an item arrives damaged or defective, the customer may request a replacement or full refund
+within 72 hours of delivery by contacting support (support@opsco.internal) with photo evidence.
+In such cases, the customer does not need to return the item unless specifically asked.
+
+RESTOCKING FEE
+A 10% restocking fee applies to orders over $200 that are returned for reasons other than
+defect or damage. This fee is waived for customers with Gold or Platinum account tier.
+
+RELATED DOCUMENTS: shipping_and_delivery_policy.txt, product_damage_claims_procedure.txt

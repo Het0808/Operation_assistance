@@ -1,0 +1,40 @@
+DOCUMENT: Low Stock and Reorder Policy
+CATEGORY: Policy
+LAST UPDATED: 2025-09-20
+OWNER: Inventory Manager
+
+---
+
+PURPOSE
+Define the triggers, responsibilities, and lead times for replenishing inventory before stockout occurs.
+
+REORDER TRIGGERS
+Each product in the catalog has a defined Reorder Point (ROP) stored in the inventory system.
+When available stock (on-hand minus reserved) drops to or below the ROP, a reorder alert is raised
+automatically by the inventory system.
+
+Default ROP formula (used when a custom ROP is not set):
+  ROP = (Average Daily Sales × Lead Time in Days) + Safety Stock
+  Default Safety Stock = 5 units for standard items, 10 units for high-velocity items.
+
+LEAD TIMES BY SUPPLIER
+- Supplier A (domestic): 5–7 business days.
+- Supplier B (electronics): 10–14 business days.
+- Supplier C (overseas, bulk): 21–28 business days.
+Lead times should be reviewed each quarter and updated in the supplier master file.
+
+APPROVAL THRESHOLDS
+- Reorders under $500 total value: Inventory Manager approves autonomously.
+- Reorders $500–$2,000: Requires countersignature from Operations Manager.
+- Reorders over $2,000: Requires sign-off from Finance before purchase order is raised.
+
+EMERGENCY STOCK PROCEDURE
+If a stockout occurs on a high-demand item, the Inventory Manager may place an emergency order
+directly with any available supplier at market price, up to $800, without waiting for standard approval.
+Emergency orders must be documented in the incident log within 24 hours.
+
+OVERSTOCK POLICY
+Items with more than 180 days of cover (stock on hand ÷ average daily sales) are flagged for review.
+Options: promotional discount, bundle with related product, or return to supplier if contract allows.
+
+RELATED DOCUMENTS: supplier_contact_directory.txt, warehouse_dispatch_procedure.txt

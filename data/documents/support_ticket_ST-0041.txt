@@ -1,0 +1,36 @@
+DOCUMENT: Support Ticket ST-0041
+CATEGORY: Support Ticket
+STATUS: Resolved
+DATE OPENED: 2025-10-14
+DATE CLOSED: 2025-10-16
+AGENT: Sarah K.
+CUSTOMER ACCOUNT: ACC-7821 (account tier: Standard)
+
+---
+
+ORDER REFERENCE: ORD-00892
+PRODUCT: EL-10042 — Wireless Charging Pad (15W)
+
+ISSUE REPORTED
+Customer reported that the wireless charging pad stopped charging their phone after three weeks of use.
+Phone model: Samsung Galaxy S22. Phone is in a standard silicone case approximately 3 mm thick.
+Customer asked for a replacement or refund.
+
+INVESTIGATION
+Agent checked product notes for EL-10042.
+Serial number provided by customer: WCP-2023-44812.
+Serial number prefix WCP-2023 confirms this unit is from the affected pre-B24-07 batch.
+Product notes state: "Replace on request, no questions asked" for this batch.
+
+RESOLUTION
+Replacement unit dispatched under new order ORD-00931 (expedited, no charge).
+Customer advised the replacement is from the updated batch and confirmed compatible with cases up to 6 mm.
+No return of defective unit requested (unit value under $300 threshold).
+Carrier claim not applicable (manufacturing issue, not transit damage).
+
+OUTCOME
+Customer confirmed receipt of replacement on 2025-10-16. Ticket closed satisfied.
+
+NOTES FOR RECORD
+Third ticket this month related to WCP-2023 batch. Product Manager notified to consider proactive
+outreach to other customers who may have purchased this batch. See product_notes_electronics.txt.
