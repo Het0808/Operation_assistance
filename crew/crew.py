@@ -7,39 +7,21 @@ a sourced markdown report.
 
 from __future__ import annotations
 
-import logging
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 from crewai import Agent, Crew, Process, Task
 from crewai_tools import MCPServerAdapter
 from mcp import StdioServerParameters
 
+from tracer import RunTracer
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).parent.parent
 _SERVER_SCRIPT = _REPO_ROOT / "server" / "mcp_server.py"
-_TRACES_DIR = _REPO_ROOT / "traces"
-_TRACES_DIR.mkdir(exist_ok=True)
-
-# ---------------------------------------------------------------------------
-# Logging — trace file per run
-# ---------------------------------------------------------------------------
-_RUN_ID = datetime.now().strftime("%Y%m%d_%H%M%S")
-_TRACE_FILE = _TRACES_DIR / f"run_{_RUN_ID}.log"
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(_TRACE_FILE, encoding="utf-8"),
-        logging.StreamHandler(sys.stderr),
-    ],
-)
-logger = logging.getLogger("crew")
 
 # ---------------------------------------------------------------------------
 # Grounding rule — injected into every agent backstory and every task
@@ -53,31 +35,6 @@ _GROUNDING_RULE = (
 )
 
 # ---------------------------------------------------------------------------
-# Step callback — writes one structured line per agent step to the trace file
-# ---------------------------------------------------------------------------
-def _step_callback(step_output) -> None:
-    try:
-        agent_name = getattr(step_output, "agent", "unknown")
-        tool = getattr(step_output, "tool", None)
-        tool_input = getattr(step_output, "tool_input", None)
-        result = getattr(step_output, "result", None)
-
-        action = tool if tool else "final_answer"
-        input_preview = str(tool_input)[:300] if tool_input else ""
-        output_preview = str(result)[:200] if result else ""
-
-        logger.info(
-            "STEP | agent=%s | action=%s | input=%r | output_preview=%r",
-            agent_name,
-            action,
-            input_preview,
-            output_preview,
-        )
-    except Exception as exc:
-        logger.warning("Step callback error (non-fatal): %s", exc)
-
-
-# ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
 def run_crew(question: str) -> str:
@@ -89,7 +46,8 @@ def run_crew(question: str) -> str:
     if not question or not question.strip():
         raise ValueError("question must not be empty.")
 
-    logger.info("Run started | question=%r", question)
+    tracer = RunTracer(question)
+    tracer.start()
 
     server_params = StdioServerParameters(
         command=sys.executable,
@@ -102,7 +60,7 @@ def run_crew(question: str) -> str:
     try:
         adapter.start()
         tools = adapter.tools
-        logger.info("MCP server started | tools available: %s", [t.name for t in tools])
+        tracer.log_agent_action("system", thought=f"MCP server started | tools: {[t.name for t in tools]}")
 
         # Partition tools by name so each agent receives only what it needs
         def _tool(name: str):
@@ -278,24 +236,23 @@ def run_crew(question: str) -> str:
             tasks=[research_task, analysis_task, write_task],
             process=Process.sequential,
             verbose=True,
-            step_callback=_step_callback,
+            step_callback=tracer.step_callback,
         )
 
         result = crew.kickoff(inputs={"question": question})
-        logger.info("Run completed | result_preview=%r", str(result)[:300])
+        tracer.stop()
         return str(result)
 
     except Exception as exc:
-        logger.error("Crew run failed: %s", exc, exc_info=True)
+        tracer.stop(error=str(exc))
         raise
 
     finally:
         try:
             adapter.stop()
-            logger.info("MCP server stopped cleanly.")
-        except Exception as exc:
-            logger.warning("Error stopping MCP server (non-fatal): %s", exc)
-        logger.info("Trace written to: %s", _TRACE_FILE)
+        except Exception:
+            pass
+        print(f"\nTrace written to: {tracer.trace_path}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------------------

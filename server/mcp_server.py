@@ -271,9 +271,9 @@ def save_report(title: str, content: str) -> str:
         logger.error("Failed to write report: %s", exc)
         return "ERROR: Report could not be saved due to a file system error. Contact the system administrator."
 
-    relative = report_path.relative_to(_REPO_ROOT)
+    display_path = Path("outputs") / "reports" / report_path.name
     return (
-        f"REPORT SAVED: {relative}\n"
+        f"REPORT SAVED: {display_path}\n"
         f"Title   : {validated.title}\n"
         f"Length  : {len(markdown)} characters\n"
         f"Saved at: {saved_at}"
