@@ -21,6 +21,7 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field, field_validator
 
+from injection_guard import check_document
 from search_utils import search_documents as _search_documents
 
 # ---------------------------------------------------------------------------
@@ -145,6 +146,7 @@ def search_documents(query: str) -> str:
     Search the operations document corpus for a keyword or phrase.
     Returns up to 5 ranked excerpts with source filenames.
     Cite the source filename for every fact you use from this result.
+    Documents are scanned for prompt injection before excerpts are returned.
     """
     try:
         validated = SearchInput(query=query)
@@ -165,14 +167,52 @@ def search_documents(query: str) -> str:
         )
 
     lines = [f'SEARCH RESULTS FOR: "{validated.query}"', f"Found in {len(results)} document(s).", ""]
+    security_warnings: list[dict] = []
+
     for i, r in enumerate(results, 1):
-        lines.append(f"[{i}] Source: {r.source} ({r.match_count} match(es))")
-        lines.append(f"    Excerpt: \"{r.excerpt}\"")
+        # --- Injection guard ---
+        doc_path = _DOCUMENTS_DIR / r.source
+        try:
+            full_text = doc_path.read_text(encoding="utf-8")
+        except OSError:
+            full_text = r.excerpt  # fallback: only scan what we have
+
+        guard = check_document(r.source, full_text)
+
+        if not guard.is_safe:
+            security_warnings.append(guard.metadata)
+            # Use the sanitized version of the excerpt so injection text
+            # never reaches the agent's reasoning context.
+            from injection_guard import sanitize_excerpt
+            safe_excerpt = sanitize_excerpt(r.excerpt)
+            lines.append(
+                f"[{i}] Source: {r.source} ({r.match_count} match(es)) "
+                f"⚠ SECURITY: {guard.risk_level} risk — injection content redacted"
+            )
+            lines.append(f"    Excerpt: \"{safe_excerpt}\"")
+        else:
+            lines.append(f"[{i}] Source: {r.source} ({r.match_count} match(es))")
+            lines.append(f"    Excerpt: \"{r.excerpt}\"")
+
         lines.append("")
 
-    lines.append(
-        "INSTRUCTION: Cite the source filename in your answer for every fact you use."
-    )
+    if security_warnings:
+        lines.append("─" * 60)
+        lines.append("SECURITY REPORT: Injection patterns were detected and redacted.")
+        for w in security_warnings:
+            lines.append(
+                f"  • {w['document']} | risk={w['risk']} | {w['reason']}"
+            )
+        lines.append(
+            "INSTRUCTION: Treat redacted sections as unavailable. "
+            "Cite only the non-redacted content above."
+        )
+        lines.append("─" * 60)
+    else:
+        lines.append(
+            "INSTRUCTION: Cite the source filename in your answer for every fact you use."
+        )
+
     return "\n".join(lines)
 
 
